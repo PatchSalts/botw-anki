@@ -4,5 +4,5 @@
 [ -d "botw-master" ] || unzip master.zip
 [ -f "master.zip" ] && rm master.zip
 grep -P -r -h -o -I -f japanese.pattern botw-master/Message/Msg_JPja.product.sarc | sort -u > japanese.text
-grep -P -x -f furistrip.pattern japanese.text > japanese.furistrip
-
+grep -P -x -f furistrip.pattern japanese.text > furigana.furistrip
+comm -3 japanese.text furigana.furistrip > japanese.furistrip
