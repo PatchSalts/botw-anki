@@ -16,11 +16,12 @@ comm -3 jp.text jp-wlead.text > jp-nolead.text
 
 # Prompt the user for each phrase with leading characters on whether or not said leading characters are furigana.
 echo > jp-xlead.text
+counter=1
 for line in $(cat jp-wlead.text); do
 	until [[ $prompt == "y" ]] || [[ $prompt == "n" ]]; do
 		echo ""
 		echo "$line"
-		read -n 1 -p "Is this furigana? [y/n]: " prompt
+		read -n 1 -p "($counter) Is this furigana? [y/n]: " prompt
 	done
 	case $prompt in
 		"y")
@@ -31,6 +32,7 @@ for line in $(cat jp-wlead.text); do
 			;;
 	esac
 	prompt=""
+	let "counter+=1"
 done
 
 # Next: join jp-xlead.text and jp-nolead.text into the final list of all phrases to run through mecab.
