@@ -24,10 +24,10 @@ for line in $(cat jp-wlead.text); do
 	done
 	case $prompt in
 		"y")
-			echo "$line" | grep -P -o -f jp-xlead.pattern >> leading-chars-removed.text
+			echo "$line" | grep -P -o -f jp-xlead.pattern >> jp-xlead.text
 			;;
 		"n")
-			echo "$line" >> leading-chars-removed.text
+			echo "$line" >> jp-xlead.text
 			;;
 	esac
 	prompt=""
