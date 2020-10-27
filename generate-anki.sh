@@ -1,14 +1,22 @@
 #!/bin/bash
 
+# Download the BotW resource files, extract them, delete the archive.
 [ -d "botw-master" ] || [ -f "master.zip" ] || curl -o master.zip https://codeload.github.com/leoetlino/botw/zip/master
 [ -d "botw-master" ] || unzip master.zip
 [ -f "master.zip" ] && rm master.zip
-grep -P -r -h -o -I -f japanese.pattern botw-master/Message/Msg_JPja.product.sarc | sort -u > japanese.text
-grep -P -x -f leading-chars.pattern japanese.text > leading-chars.text
-comm -3 japanese.text leading-chars.text > non-leading-chars.text
 
-echo > leading-chars-removed.text
-for line in $(cat leading-chars.text); do
+# Generate a text file containing all Japanese phrases in the resources.
+grep -P -r -h -o -I -f jp.pattern botw-master/Message/Msg_JPja.product.sarc | sort -u > jp.text
+
+# Generate a text file containing all Japanese phrases that have the format [kana/punct][kanji][anything].
+grep -P -x -f jp-wlead.pattern jp.text > jp-wlead.text
+
+# Generate a text file containing all Japanese phrase that DO NOT have the format [kana/punct][kanji][anything].
+comm -3 jp.text jp-wlead.text > jp-nolead.text
+
+# Prompt the user for each phrase with leading characters on whether or not said leading characters are furigana.
+echo > jp-xlead.text
+for line in $(cat jp-wlead.text); do
 	until [[ $prompt == "y" ]] || [[ $prompt == "n" ]]; do
 		echo ""
 		echo "$line"
@@ -16,7 +24,7 @@ for line in $(cat leading-chars.text); do
 	done
 	case $prompt in
 		"y")
-			echo "$line" | grep -P -o -f remove-leading.pattern >> leading-chars-removed.text
+			echo "$line" | grep -P -o -f jp-xlead.pattern >> leading-chars-removed.text
 			;;
 		"n")
 			echo "$line" >> leading-chars-removed.text
@@ -24,3 +32,5 @@ for line in $(cat leading-chars.text); do
 	esac
 	prompt=""
 done
+
+# Next: join jp-xlead.text and jp-nolead.text into the final list of all phrases to run through mecab.
